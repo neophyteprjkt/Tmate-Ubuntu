@@ -1,0 +1,19 @@
+name: "Tmate Ubuntu SSH"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: setup
+        run: |
+          export TERM=xterm
+
+          wget https://raw.githubusercontent.com/neophyteprjkt/Android-CI/main/dependency.sh
+          bash dependency.sh
+
+      - name: tmate ssh link
+        run: |
+          tmate -F
