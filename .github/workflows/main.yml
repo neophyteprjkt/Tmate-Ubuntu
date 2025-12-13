@@ -6,6 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    timeout-minutes: 360
     steps:
       - name: setup
         run: |
@@ -13,6 +14,6 @@ jobs:
           wget https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/dependency.sh
           bash dependency.sh
 
-      - name: tmate ssh (auto root)
+      - name: tmate ssh (root + cd)
         run: |
-          sudo bash -c 'tmate -F'
+          sudo bash -c 'cd && tmate -F'
