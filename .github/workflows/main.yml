@@ -10,10 +10,9 @@ jobs:
       - name: setup
         run: |
           export TERM=xterm
-
           wget https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/dependency.sh
           bash dependency.sh
 
-      - name: tmate ssh link
+      - name: tmate ssh link (root)
         run: |
-          tmate -F
+          tmate -F -- sudo -i
