@@ -13,6 +13,6 @@ jobs:
           wget https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/dependency.sh
           bash dependency.sh
 
-      - name: tmate ssh link (root)
+      - name: tmate ssh (auto root)
         run: |
-          tmate -F -- sudo -i
+          sudo bash -c 'tmate -F'
