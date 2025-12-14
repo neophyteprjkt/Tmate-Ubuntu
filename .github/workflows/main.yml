@@ -16,4 +16,4 @@ jobs:
 
       - name: tmate ssh (root + cd)
         run: |
-          sudo bash -c 'cd && byobu && tmate -F'
+          sudo bash -c 'cd && tmate -F'
