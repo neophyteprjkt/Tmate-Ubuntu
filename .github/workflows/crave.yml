@@ -1,0 +1,20 @@
+name: "Crave Run"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    steps:
+      - name: setup
+        run: |
+          export TERM=xterm
+          wget https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/dependency.sh
+          wget https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/run.sh
+          bash dependency.sh
+
+      - name: tmate ssh link
+        run: |
+          tmate -F
