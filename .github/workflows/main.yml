@@ -27,22 +27,10 @@ jobs:
           echo "======================================"
           echo " Ubuntu GitHub Actions Runner"
           echo "======================================"
-
-          echo "Hostname:"
-          hostname
-
-          echo "User:"
-          whoami
-
-          echo "Kernel:"
-          uname -a
-
-          echo "IP:"
-          hostname -I || true
-
+          echo "Hostname: $(hostname)"
+          echo "User: $(whoami)"
+          echo "Kernel: $(uname -a)"
           echo "======================================"
 
       - name: Start SSH session
         uses: owenthereal/action-upterm@v1
-        with:
-          limit-access-to-actor: true
