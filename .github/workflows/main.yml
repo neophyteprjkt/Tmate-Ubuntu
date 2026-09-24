@@ -1,4 +1,4 @@
-name: "Ubuntu SSH Runner"
+name: "Ubuntu SSH"
 
 on:
   workflow_dispatch:
@@ -9,38 +9,40 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Setup
+      - name: Setup dependency
         shell: bash
         run: |
           set -e
           export TERM=xterm
 
-          wget https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/dependency.sh
+          wget -O dependency.sh \
+            https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/dependency.sh
+
+          chmod +x dependency.sh
           bash dependency.sh
 
-      - name: Verify SSH
+      - name: Check environment
         shell: bash
         run: |
-          set -e
+          echo "======================================"
+          echo " Ubuntu GitHub Actions Runner"
+          echo "======================================"
 
-          echo "=== SSH ==="
-          sudo systemctl status ssh --no-pager || true
+          echo "Hostname:"
+          hostname
 
-          echo "=== Listening ports ==="
-          sudo ss -lntp
+          echo "User:"
+          whoami
 
-          echo "=== Runner IP ==="
+          echo "Kernel:"
+          uname -a
+
+          echo "IP:"
           hostname -I || true
 
-          echo "=== SSH version ==="
-          ssh -V
+          echo "======================================"
 
-      - name: Keep runner alive
-        shell: bash
-        run: |
-          echo "Runner is ready."
-          echo "Waiting until the workflow timeout..."
-
-          while true; do
-            sleep 60
-          done
+      - name: Start SSH session
+        uses: owenthereal/action-upterm@v1
+        with:
+          limit-access-to-actor: true
