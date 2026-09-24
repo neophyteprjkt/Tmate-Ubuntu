@@ -7,13 +7,59 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     timeout-minutes: 360
+
     steps:
-      - name: setup
+      - name: Setup dependency
+        shell: bash
         run: |
+          set -e
+
           export TERM=xterm
-          wget https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/dependency.sh
+
+          wget -O dependency.sh \
+            https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/dependency.sh
+
+          chmod +x dependency.sh
           bash dependency.sh
 
-      - name: tmate ssh (root + cd)
+      - name: Check network and DNS
+        shell: bash
         run: |
-          sudo bash -c 'cd && tmate -F'
+          echo "=== Network test ==="
+          curl -4 -I --max-time 15 https://github.com || true
+
+          echo ""
+          echo "=== DNS test ==="
+
+          for i in {1..10}; do
+            echo "DNS attempt $i/10..."
+
+            if getent hosts ssh.tmate.io; then
+              echo "DNS lookup OK"
+              break
+            fi
+
+            echo "DNS lookup failed, retrying in 3 seconds..."
+            sleep 3
+          done
+
+          echo ""
+          echo "=== Final DNS result ==="
+
+          if ! getent hosts ssh.tmate.io; then
+            echo "ERROR: ssh.tmate.io cannot be resolved."
+            exit 1
+          fi
+
+      - name: Tmate SSH
+        shell: bash
+        run: |
+          set -e
+
+          export TERM=xterm
+
+          sudo bash -c '
+            cd
+            export TERM=xterm
+            tmate -F
+          '
