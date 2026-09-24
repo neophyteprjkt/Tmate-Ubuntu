@@ -9,11 +9,10 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Setup dependency
+      - name: Setup
         shell: bash
         run: |
           set -e
-
           export TERM=xterm
 
           wget -O dependency.sh \
@@ -22,40 +21,34 @@ jobs:
           chmod +x dependency.sh
           bash dependency.sh
 
-      - name: Check network and DNS
+      - name: Diagnose DNS
         shell: bash
         run: |
-          echo "=== Network test ==="
-          curl -4 -I --max-time 15 https://github.com || true
+          set -x
 
-          echo ""
-          echo "=== DNS test ==="
+          echo "=== resolv.conf ==="
+          cat /etc/resolv.conf
 
-          for i in {1..10}; do
-            echo "DNS attempt $i/10..."
+          echo "=== DNS tools ==="
+          sudo apt-get update
+          sudo apt-get install -y dnsutils
 
-            if getent hosts ssh.tmate.io; then
-              echo "DNS lookup OK"
-              break
-            fi
+          echo "=== Google DNS ==="
+          nslookup ssh.tmate.io 8.8.8.8 || true
 
-            echo "DNS lookup failed, retrying in 3 seconds..."
-            sleep 3
-          done
+          echo "=== Cloudflare DNS ==="
+          nslookup ssh.tmate.io 1.1.1.1 || true
 
-          echo ""
-          echo "=== Final DNS result ==="
+          echo "=== System DNS ==="
+          nslookup ssh.tmate.io || true
 
-          if ! getent hosts ssh.tmate.io; then
-            echo "ERROR: ssh.tmate.io cannot be resolved."
-            exit 1
-          fi
+          echo "=== HTTPS test ==="
+          curl -4 -Iv --connect-timeout 10 \
+            https://ssh.tmate.io/ || true
 
-      - name: Tmate SSH
+      - name: Start tmate
         shell: bash
         run: |
-          set -e
-
           export TERM=xterm
 
           sudo bash -c '
