@@ -1,4 +1,4 @@
-name: "Tmate Ubuntu SSH"
+name: "Ubuntu SSH Runner"
 
 on:
   workflow_dispatch:
@@ -15,44 +15,32 @@ jobs:
           set -e
           export TERM=xterm
 
-          wget -O dependency.sh \
-            https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/dependency.sh
-
-          chmod +x dependency.sh
+          wget https://raw.githubusercontent.com/neophyteprjkt/Tmate-Ubuntu/main/dependency.sh
           bash dependency.sh
 
-      - name: Diagnose DNS
+      - name: Verify SSH
         shell: bash
         run: |
-          set -x
+          set -e
 
-          echo "=== resolv.conf ==="
-          cat /etc/resolv.conf
+          echo "=== SSH ==="
+          sudo systemctl status ssh --no-pager || true
 
-          echo "=== DNS tools ==="
-          sudo apt-get update
-          sudo apt-get install -y dnsutils
+          echo "=== Listening ports ==="
+          sudo ss -lntp
 
-          echo "=== Google DNS ==="
-          nslookup ssh.tmate.io 8.8.8.8 || true
+          echo "=== Runner IP ==="
+          hostname -I || true
 
-          echo "=== Cloudflare DNS ==="
-          nslookup ssh.tmate.io 1.1.1.1 || true
+          echo "=== SSH version ==="
+          ssh -V
 
-          echo "=== System DNS ==="
-          nslookup ssh.tmate.io || true
-
-          echo "=== HTTPS test ==="
-          curl -4 -Iv --connect-timeout 10 \
-            https://ssh.tmate.io/ || true
-
-      - name: Start tmate
+      - name: Keep runner alive
         shell: bash
         run: |
-          export TERM=xterm
+          echo "Runner is ready."
+          echo "Waiting until the workflow timeout..."
 
-          sudo bash -c '
-            cd
-            export TERM=xterm
-            tmate -F
-          '
+          while true; do
+            sleep 60
+          done
